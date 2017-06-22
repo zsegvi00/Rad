@@ -44,7 +44,7 @@ function showMap(coords) {
 	});
 
 	showForm();
-	upload();
+	//upload();
 }
 
 function makePlacesRequest(lat,lng) {
