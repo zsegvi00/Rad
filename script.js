@@ -163,20 +163,46 @@ uploadButton.on('click', function(e) {
 function processFile(e) {
     var file = e.target.result,
         results;
+
+        var counter = 0;
+        var content = '<table>'
     if (file && file.length) {
         results = file.split("\n");
+        
         results.forEach(function (result){
-        	var latlng = result.split(" ");
-        	var myLatLng = {lat: parseFloat(latlng[0]), lng: parseFloat(latlng[1])};
+        	
+        	
+        	var latlng = result.split(", ");
+        	if(latlng[0]!=undefined && latlng[1]!=undefined && latlng[2]!=undefined && latlng[3]!=undefined )
+        	{
+        		content += '<tr class ="rows">'
+        		content += '<td class ="stupac">'+ latlng[0] + '</td>' + '<td class ="stupac">'+ latlng[1] +'</td>' + '<td class ="stupac">'+ latlng[2] +'</td>' + '<td class ="stupac">'+ latlng[3] +'</td></tr>';
+
+        	}
+
+        	if (counter > 0)
+        	{var myLatLng = {lat: parseFloat(latlng[0]), lng: parseFloat(latlng[1])};
         	var marker = new google.maps.Marker({
             position: myLatLng,
-            title: 'File upload!'
+            title: latlng[2] + ", " + latlng[3]
              });
+        	
         	marker.setMap(map);
         	markers.push(marker)
+        }
+        
+        
+        
+
+        counter++;
+        
 
         });
+
+        content += '</table>'
         
+        $('#table').append(content);
+        $('#table').addClass('foo');
         
     }
 }
