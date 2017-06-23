@@ -44,7 +44,7 @@ function showMap(coords) {
 	});
 
 	showForm();
-	//upload();
+	upload();
 }
 
 function makePlacesRequest(lat,lng) {
@@ -139,73 +139,108 @@ window.onload = function() {
 
 function upload () {
 	var fileInput = $('#files');
-var uploadButton = $('#upload');
+	var uploadButton = $('#upload'); 
 
-uploadButton.on('click', function(e) {
-    e.preventDefault();
-    clearMarkers();
-    if (!window.FileReader) {
-        alert('Your browser is not supported')
-    }
-    var input = fileInput.get(0);
-    
-    // Create a reader object
-    var reader = new FileReader();
-    if (input.files.length) {
-        var textFile = input.files[0];
-        reader.readAsText(textFile);
-        $(reader).on('load', processFile);
-    } else {
-        alert('Please upload a file before continuing')
-    } 
-});
+	uploadButton.on('click', function(e) {
+	    e.preventDefault();
+	    clearMarkers();
+	    if (!window.FileReader) {
+	        alert('Your browser is not supported')
+	    }
+	    var input = fileInput.get(0);
+	    
+	    // Create a reader object
+	    var reader = new FileReader();
+	    if (input.files.length) {
+	        var textFile = input.files[0];
+	        reader.readAsText(textFile);
+	        $(reader).on('load', processFile);
+	    } else {
+	        alert('Please upload a file before continuing')
+	    } 
+	});
 
-function processFile(e) {
-    var file = e.target.result,
-        results;
+	function processFile(e) {
+	    var file = e.target.result,
+	        results;
 
-        var counter = 0;
-        var content = '<table>'
-    if (file && file.length) {
-        results = file.split("\n");
-        
-        results.forEach(function (result){
-        	
-        	
-        	var latlng = result.split(", ");
-        	if(latlng[0]!=undefined && latlng[1]!=undefined && latlng[2]!=undefined && latlng[3]!=undefined )
-        	{
-        		content += '<tr class ="rows">'
-        		content += '<td class ="stupac">'+ latlng[0] + '</td>' + '<td class ="stupac">'+ latlng[1] +'</td>' + '<td class ="stupac">'+ latlng[2] +'</td>' + '<td class ="stupac">'+ latlng[3] +'</td></tr>';
+	    var counter = 0;
+	    var content = '<table>';
 
-        	}
+	    if (file && file.length) {
+	        results = file.split("\n");
+	        content += 
+	        '<tr class ="rows">'+
+	        '<td class ="stupac">X</td>' + 
+	        '<td class ="stupac">Y</td>' + 
+	        '<td class ="stupac">Address</td>' + 
+	        '<td class ="stupac">Description</td>'+
+	        '<td class ="stupac"></td><tr>';
 
-        	if (counter > 0)
-        	{var myLatLng = {lat: parseFloat(latlng[0]), lng: parseFloat(latlng[1])};
-        	var marker = new google.maps.Marker({
-            position: myLatLng,
-            title: latlng[2] + ", " + latlng[3]
-             });
-        	
-        	marker.setMap(map);
-        	markers.push(marker)
-        }
-        
-        
-        
+	        results.forEach(function (result){
+	        	
+	        	var position= {};
+	        	[position.lat, position.lng, position.address, position.desc] = result.split(", ");
+	        	if(position.lat!=undefined && position.lng!=undefined && position.address!=undefined && position.desc!=undefined ){
+	        		
+	        		content += 
+	        		'<tr class ="rows">'+
+	        		'<td class ="stupac">'+ position.lat + '</td>' + 
+	        		'<td class ="stupac">'+ position.lng +'</td>' + 
+	        		'<td class ="stupac">'+ position.address +'</td>' + 
+	        		'<td class ="stupac">'+ position.desc +'</td>'+
+	        		'<td class ="stupac"><button class="center-button" data-lat='+ position.lat +' data-lng='+ position.lng +'>Get Center</button></td></tr>';
 
-        counter++;
-        
+	        	}
 
-        });
+	        	var myLatLng = { lat: parseFloat(position.lat), lng: parseFloat(position.lng) };
+	        	
+		        var marker = new google.maps.Marker({
+			        position: myLatLng,
+			        title: position.address + ", " + position.desc
+		        });
+		        	
+		        marker.setMap(map);
+		        markers.push(marker)
+		        
+	        });
 
-        content += '</table>'
-        
-        $('#table').append(content);
-        $('#table').addClass('foo');
-        
-    }
-}
+	        content += '</table>'
+	        
+	        $('#table').append(content);
+	        $('#table').addClass('foo');
+
+	        $('.center-button').on('click', function(event){
+
+	        	var $this = $(this);
+	        	var latitude = $this.data('lat');
+	        	var longitude = $this.data('lng');
+	        	$('.yellow').removeClass('yellow');
+	        	$(this).closest('tr').addClass('yellow');
+
+	        	var googleLatLong = new google.maps.LatLng(parseFloat(latitude), parseFloat(longitude));
+	        	map.panTo(googleLatLong);
+
+	        	markers.forEach(function(marker){
+
+	        		if(marker.position.lat() === googleLatLong.lat() && marker.position.lng() === googleLatLong.lng()){
+	        			marker.setIcon('http://maps.google.com/mapfiles/ms/icons/yellow-dot.png');
+	        		}
+	        		else{
+	        			marker.setIcon('http://maps.google.com/mapfiles/ms/icons/red-dot.png');
+	        		}
+	        	});
+	        });
+	        
+	        var bounds = new google.maps.LatLngBounds();
+		    for (var i = 0; i < markers.length-1; i++) {
+		        bounds.extend(markers[i].getPosition());
+		    }
+
+		    map.panTo(bounds.getCenter());
+		    map.fitBounds(bounds);   
+	    }
+	}
 }
 
 
