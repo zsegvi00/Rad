@@ -169,13 +169,13 @@ function upload () {
 
 	    if (file && file.length) {
 	        results = file.split("\n");
-	        content += 
+	        /*content += 
 	        '<tr class ="rows">'+
 	        '<td class ="stupac">X</td>' + 
 	        '<td class ="stupac">Y</td>' + 
 	        '<td class ="stupac">Address</td>' + 
 	        '<td class ="stupac">Description</td>'+
-	        '<td class ="stupac"></td><tr>';
+	        '<td class ="stupac"></td><tr>';*/
 
 	        results.forEach(function (result){
 	        	
