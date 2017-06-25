@@ -168,6 +168,7 @@ function upload () {
 	    var content = '<table>';
 
 	    if (file && file.length) {
+	        var counter = 0;
 	        results = file.split("\n");
 	        /*content += 
 	        '<tr class ="rows">'+
@@ -180,7 +181,10 @@ function upload () {
 	        results.forEach(function (result){
 	        	
 	        	var position= {};
+	        	
 	        	[position.lat, position.lng, position.address, position.desc] = result.split(", ");
+	        	if (counter > 0)
+	        	{
 	        	if(position.lat!=undefined && position.lng!=undefined && position.address!=undefined && position.desc!=undefined ){
 	        		
 	        		content += 
@@ -201,8 +205,10 @@ function upload () {
 		        });
 		        	
 		        marker.setMap(map);
-		        markers.push(marker)
-		        
+		        markers.push(marker);
+
+		    }
+		        counter++;
 	        });
 
 	        content += '</table>'
